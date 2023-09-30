@@ -937,6 +937,7 @@ AC_CHECK_HEADERS([ \
   string.h \
   sys/socket.h \
   sys/time.h \
+  sysinfoapi.h \
   syslog.h \
   time.h \
   unistd.h \
@@ -1011,6 +1012,7 @@ AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([ \
   _Exit \
   accept4 \
+  clock_gettime \
   dup2 \
   getcwd \
   getpwnam \
@@ -1035,6 +1037,25 @@ AC_CHECK_FUNCS([ \
 
 AC_CHECK_FUNC([timerfd_create],
               [have_timerfd_create=yes], [have_timerfd_create=no])
+
+AC_MSG_CHECKING([checking for GetTickCount64])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+[[
+#include <sysinfoapi.h>
+]],
+[[
+GetTickCount64();
+]])],
+[have_gettickcount64=yes],
+[have_gettickcount64=no])
+
+if test "x${have_gettickcount64}" = "xyes"; then
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([HAVE_GETTICKCOUNT64], [1],
+            [Define to 1 if you have `GetTickCount64` function.])
+else
+  AC_MSG_RESULT([no])
+fi
 
 # For cygwin: we can link initgroups, so AC_CHECK_FUNCS succeeds, but
 # cygwin disables initgroups due to feature test macro magic with our
